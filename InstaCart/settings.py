@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,8 +33,9 @@ ALLOWED_HOSTS = [
     "rest-71by.onrender.com",
     "rest-pmy6.onrender.com",
     ".onrender.com",
-    "127.0.0.1:8000",
+    "127.0.0.1",  # Add '127.0.0.1' without the port
 ]
+
 
 # Application definition
 
@@ -92,6 +94,7 @@ DATABASES = {
     }
 }
 
+DATABASES["default"] = dj_database_url.parse("postgres://instacart_db_335l_user:bw9UofwJzwOYDe6SzV19912vbhwcMBxZ@dpg-cof5ge779t8c73cc76s0-a.oregon-postgres.render.com/instacart_db_335l")
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
