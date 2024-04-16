@@ -94,7 +94,7 @@ DATABASES = {
     }
 }
 
-DATABASES["default"] = dj_database_url.parse("postgres://instacart_db_335l_user:bw9UofwJzwOYDe6SzV19912vbhwcMBxZ@dpg-cof5ge779t8c73cc76s0-a.oregon-postgres.render.com/instacart_db_335l")
+DATABASES["default"] = dj_database_url.parse("postgres://instacart_db_335l_user:bw9UofwJzwOYDe6SzV19912vbhwcMBxZ@dpg-cof5ge779t8c73cc76s0-a/instacart_db_335l")
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
