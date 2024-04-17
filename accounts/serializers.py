@@ -1,10 +1,9 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import User
+from django.contrib.auth.hashers import make_password
 # from django.contrib.auth.models import User
 from rest_framework.views import APIView
-
-
 # class RegisterSerializer(serializers.Serializer):
 #     username = serializers.CharField()
 #     password = serializers.CharField()
@@ -44,6 +43,7 @@ class RegisterSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         validated_data['role'] = User.CUSTOMER  # Set the role to CUSTOMER when creating a new user
+        validated_data['password'] = make_password(validated_data['password'])
         user = User.objects.create(**validated_data)
         return user
 
