@@ -34,7 +34,6 @@ ALLOWED_HOSTS = [
     "rest-pmy6.onrender.com",
     ".onrender.com",
     "127.0.0.1",
-    "http://localhost:3000"
 ]
 
 
@@ -48,6 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'corsheaders',
     "accounts",
     'rest_framework',
     'rest_framework.authtoken',
@@ -63,6 +63,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = "InstaCart.urls"
@@ -120,7 +121,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Example: your React.js frontend's domain
+    # Add more origins as needed
+]
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
