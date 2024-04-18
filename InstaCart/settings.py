@@ -33,8 +33,10 @@ ALLOWED_HOSTS = [
     "rest-71by.onrender.com",
     "rest-pmy6.onrender.com",
     ".onrender.com",
-    "127.0.0.1",  # Add '127.0.0.1' without the port
+    "127.0.0.1",
+    "http://localhost:3000"
 ]
+
 
 
 # Application definition
@@ -162,3 +164,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100
 }
+
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = True
