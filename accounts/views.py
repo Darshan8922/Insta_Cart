@@ -35,7 +35,7 @@ class LoginAPI(APIView):
         else:
             return Response({'status': False, 'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-class ForgotPasswordAPI(APIView):
+class ChangePasswordAPI(APIView):
     def post(self, request):
         serializer = ForgotSerializer(data=request.data)
         if serializer.is_valid():
