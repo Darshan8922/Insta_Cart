@@ -29,4 +29,8 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
 
-#
+class ForgotSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    old_password = serializers.CharField()
+    new_password = serializers.CharField()
+    confirm_password = serializers.CharField()

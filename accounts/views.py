@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserRegistrationSerializer, LoginSerializer
+from .serializers import UserRegistrationSerializer, LoginSerializer, ForgotSerializer
 from django.contrib.auth import authenticate
 from datetime import datetime
 from django.conf import settings
@@ -34,3 +34,26 @@ class LoginAPI(APIView):
                 return Response({'status': False, 'message': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
             return Response({'status': False, 'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+class ForgotPasswordAPI(APIView):
+    def post(self, request):
+        serializer = ForgotSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            old_password = serializer.validated_data['old_password']
+            new_password = serializer.validated_data['new_password']
+            confirm_password = serializer.validated_data['confirm_password']
+
+            user = authenticate(request, email=email, password=old_password)
+            if user:
+                if new_password == confirm_password:
+                    # Validate the new password
+                    user.set_password(new_password)
+                    user.save()
+                    return Response({'status': True, 'message': 'Password updated successfully'}, status=status.HTTP_200_OK)
+                else:
+                    return Response({'status': False, 'message': 'Both passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'status': False, 'message': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response({'status': False, 'message': 'Enter valid credentials'}, status=status.HTTP_400_BAD_REQUEST)
