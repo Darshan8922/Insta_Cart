@@ -10,6 +10,7 @@ urlpatterns = [
     path("forgot_password/", ForgotAPI.as_view()),
     path("change-password/", ForgotChangePassword.as_view()),
     
+    
     path("refresh-token/", ValidateRefreshToken.as_view()),
     
     #ChangeDetail
