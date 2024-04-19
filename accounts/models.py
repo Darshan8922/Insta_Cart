@@ -35,7 +35,11 @@ class User(AbstractBaseUser):
 
     name = models.CharField(max_length=50, blank=True, null=True)
     phone_number = models.CharField(max_length=12, blank=True, null=True)
-    forgot_password_token = models.CharField(max_length=200, blank=True, null=True)
+    #Tokens
+    forgot_password_token = models.CharField(max_length=600, blank=True, null=True)
+    access_token = models.CharField(max_length=600, blank=True, null=True)
+    refresh_token = models.CharField(max_length=600, blank=True, null=True)
+    
     username = models.CharField(max_length=20, blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)

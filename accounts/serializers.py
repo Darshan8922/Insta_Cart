@@ -35,5 +35,13 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField()
     confirm_password = serializers.CharField()
 
+#Forgot Password
 class ForgotSerializer(serializers.Serializer):
     email = serializers.EmailField()
+
+class ForgotpasswordSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    password = serializers.CharField()
+    
+class RefreshTokenSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField()

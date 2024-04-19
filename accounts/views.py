@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserRegistrationSerializer, LoginSerializer, ForgotSerializer, ChangePasswordSerializer
+from .serializers import UserRegistrationSerializer, LoginSerializer, ForgotSerializer, ChangePasswordSerializer, ForgotpasswordSerializer, RefreshTokenSerializer
 from django.contrib.auth import authenticate
 from datetime import datetime
 from django.conf import settings
@@ -9,6 +9,7 @@ import jwt
 from accounts.models import User
 from .helpers import send_forget_password_mail
 import uuid
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 class RegisterAPI(APIView):
     def post(self, request):
@@ -29,9 +30,17 @@ class LoginAPI(APIView):
             user = authenticate(request, email=email, password=password)
             if user is not None:
                 current_time = datetime.now().isoformat()
-                auth_token = jwt.encode({'email': user.email, 'time': current_time}, settings.JWT_SECRET_KEY)
+                # auth_token = jwt.encode({'email': user.email, 'time': current_time}, settings.JWT_SECRET_KEY)
+                auth_token = AccessToken.for_user(user)
+                refresh_token = RefreshToken.for_user(user).access_token
+                
+                user.access_token=auth_token
+                user.refresh_token=refresh_token
+                user.save()
+                print(user.access_token)
+                print(user.refresh_token)
                 serializer = UserRegistrationSerializer(user)
-                return Response({'status': True, 'token': auth_token, 'user': serializer.data}, status=status.HTTP_200_OK)
+                return Response({'status': True, 'access_token': str(auth_token), 'refresh_token': str(refresh_token), 'user': serializer.data}, status=status.HTTP_200_OK)
             else:
                 return Response({'status': False, 'message': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
@@ -78,17 +87,50 @@ class ForgotAPI(APIView):
             print(user_obj.forgot_password_token)
             user_obj.save()
             send_forget_password_mail(user_obj, token)
+            print(token)
             return Response({'status': True, 'message': 'An email has been sent'}, status=status.HTTP_200_OK)
 
-# class ForgotChangePassword(APIView):
-#     def post(self, request, token):
-#         context= {}
-#         try: 
-#             profile_obj = Profile.objects.filter(forgot_password_token = token).first()
-#             print(profile_obj)
-#         except Exception as e:
-#             return(e)
-
+class ForgotChangePassword(APIView):
+    def post(self, request):
+        serializer = ForgotpasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            token = serializer.validated_data['token']
+            if not User.objects.filter(forgot_password_token = token).first():
+                return Response({'status': False, 'message': 'Token is not Valid'}, status=status.HTTP_400_BAD_REQUEST)
+                
+            user_obj = User.objects.get(forgot_password_token = token)
+            print(user_obj)
+            password = serializer.validated_data['password']
+            user_obj.set_password(password)
+            user_obj.save()
+            return Response({'status': True, 'message': 'Password has been updated'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'status': False, 'message': 'Enter valid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+             
+        
+class ValidateRefreshToken(APIView):
+    def post(self, request):
+        serializer = RefreshTokenSerializer(data=request.data)
+        if serializer.is_valid():
+            token = serializer.validated_data['refresh_token']
+            
+            try:
+                user_obj = User.objects.get(refresh_token=token)
+            except User.DoesNotExist:
+                return Response({'status': False, 'message': 'Token is not valid'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Generate a new access token for the user
+            access_token = AccessToken.for_user(user_obj)
+            
+            # Update the user's access token in the database
+            user_obj.access_token = access_token
+            user_obj.save()
+            
+            return Response({'status': True, 'access_token': str(access_token)}, status=status.HTTP_200_OK)
+        else:
+            return Response({'status': False, 'message': 'Invalid refresh token'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            
 
 
  
