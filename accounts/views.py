@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserRegistrationSerializer, LoginSerializer, ForgotSerializer, ChangePasswordSerializer, ForgotpasswordSerializer, RefreshTokenSerializer
+from .serializers import UserRegistrationSerializer, LoginSerializer, ForgotSerializer, ChangePasswordSerializer, ForgotpasswordSerializer, RefreshTokenSerializer, UserDetailSerializer
 from django.contrib.auth import authenticate
 from datetime import datetime
 from django.conf import settings
@@ -130,7 +130,35 @@ class ValidateRefreshToken(APIView):
         else:
             return Response({'status': False, 'message': 'Invalid refresh token'}, status=status.HTTP_400_BAD_REQUEST)
             
+class ChangeDetail(APIView):
+    def patch(self, request):
+        serializer = UserDetailSerializer(data=request.data)
+        if serializer.is_valid():
+            token = serializer.validated_data['access_token']
+            print(token)
+            if not User.objects.filter(access_token=token).exists():
+                return Response({'status': False, 'message': 'Token is not valid'}, status=status.HTTP_400_BAD_REQUEST)
+            user_obj = User.objects.get(access_token=token)
             
+            # Update fields only if they are not empty
+            if 'email' in serializer.validated_data:
+                email = serializer.validated_data['email']
+                if email:
+                    user_obj.email = email
+            if 'name' in serializer.validated_data:
+                name = serializer.validated_data['name']
+                if name:
+                    user_obj.name = name
+            
+            if 'phone' in serializer.validated_data:
+                user_obj.phone_number = serializer.validated_data['phone']
+                
+            user_obj.save()
+            serializer = UserRegistrationSerializer(user_obj)
+            return Response({'status': True, 'user': serializer.data}, status=status.HTTP_200_OK)
+        else:
+            return Response({'status': False, 'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
  

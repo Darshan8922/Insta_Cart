@@ -45,3 +45,10 @@ class ForgotpasswordSerializer(serializers.Serializer):
     
 class RefreshTokenSerializer(serializers.Serializer):
     refresh_token = serializers.CharField()
+
+# To change Email, Name, PhoneNumber
+class UserDetailSerializer(serializers.Serializer):
+    access_token = serializers.CharField()
+    email = serializers.CharField(required=False)
+    name = serializers.CharField(required=False)
+    phone = serializers.CharField(required=False)
