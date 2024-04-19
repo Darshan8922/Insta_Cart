@@ -4,10 +4,11 @@ from .models import User
 class UserRegistrationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
-
+    id = serializers.IntegerField(read_only=True, source='pk')
+    
     class Meta:
         model = User
-        fields = ['email', 'password', 'name', 'phone_number', 'username', 'role']
+        fields = ['id', 'email', 'password', 'name', 'phone_number', 'username', 'role']
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
