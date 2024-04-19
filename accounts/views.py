@@ -159,9 +159,23 @@ class ChangeDetail(APIView):
         else:
             return Response({'status': False, 'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+class GetUserDetail(APIView):
+    def get(self, request):
+        access_token = request.headers.get('Authorization')
 
+        if not access_token:
+            return Response({'status': False, 'message': 'Access token is required'}, status=status.HTTP_400_BAD_REQUEST)
 
- 
+        # Extract the token from the "Bearer <token>" format
+        access_token = access_token.split(' ')[1] if 'Bearer' in access_token else access_token
+        
+        try:
+            user = User.objects.get(access_token=access_token)
+            serializer = UserRegistrationSerializer(user)
+            return Response({'status': True, 'user': serializer.data}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'status': False, 'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
 
 
 
