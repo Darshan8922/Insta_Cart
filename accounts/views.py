@@ -60,6 +60,7 @@ class ChangePasswordAPI(APIView):
         else:
             return Response({'status': False, 'message': 'Enter valid credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
+#Forgot Password
 
 class ForgotAPI(APIView):
     def post(self, request):
@@ -78,6 +79,15 @@ class ForgotAPI(APIView):
             user_obj.save()
             send_forget_password_mail(user_obj, token)
             return Response({'status': True, 'message': 'An email has been sent'}, status=status.HTTP_200_OK)
+
+# class ForgotChangePassword(APIView):
+#     def post(self, request, token):
+#         context= {}
+#         try: 
+#             profile_obj = Profile.objects.filter(forgot_password_token = token).first()
+#             print(profile_obj)
+#         except Exception as e:
+#             return(e)
 
 
 
