@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserRegistrationSerializer, LoginSerializer, ForgotSerializer, ChangePasswordSerializer, ForgotpasswordSerializer, RefreshTokenSerializer, UserDetailSerializer, RegisterAddress
+from .serializers import UserRegistrationSerializer, LoginSerializer, ForgotSerializer, ChangePasswordSerializer, ForgotpasswordSerializer, RefreshTokenSerializer, UserDetailSerializer, RegisterAddress, EditAddressSerializer
 from django.contrib.auth import authenticate
 from datetime import datetime
 from django.conf import settings
@@ -60,7 +60,7 @@ class ChangePasswordAPI(APIView):
             user = authenticate(request, email=email, password=old_password)
             if user:
                 if new_password == confirm_password:
-                    # Validate the new password
+                  
                     user.set_password(new_password)
                     user.save()
                     return Response({'status': True, 'message': 'Password updated successfully'}, status=status.HTTP_200_OK)
@@ -124,7 +124,6 @@ class ValidateRefreshToken(APIView):
             # Generate a new access token for the user
             access_token = AccessToken.for_user(user_obj)
             
-            # Update the user's access token in the database
             user_obj.access_token = access_token
             user_obj.save()
             
@@ -141,8 +140,7 @@ class ChangeDetail(APIView):
             if not User.objects.filter(access_token=token).exists():
                 return Response({'status': False, 'message': 'Token is not valid'}, status=status.HTTP_400_BAD_REQUEST)
             user_obj = User.objects.get(access_token=token)
-            
-            # Update fields only if they are not empty
+          
             if 'email' in serializer.validated_data:
                 email = serializer.validated_data['email']
                 if email:
@@ -179,51 +177,18 @@ class GetUserDetail(APIView):
             return Response({'status': False, 'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
-# class Add_register(APIView):
-#     def post(self, request):
-#         serializer = RegisterAddress(data=request.data)
-#         if serializer.is_valid():
-#             token = serializer.validated_data['token']
-#             if not User.objects.filter(access_token=token).first():
-#                 return Response({'status': False, 'message': 'Token is not valid'}, status=status.HTTP_400_BAD_REQUEST)
-#             user = User.objects.get(access_token=token)
-#             Address.user = user
-#             Address.street = serializer.validated_data['street']
-#             Address.apt_name = serializer.validated_data['apt_name']
-#             Address.business_name = serializer.validated_data['business_name']
-#             Address.zip_code = serializer.validated_data['zip_code']
-#             Address.save()
-#             serializer = RegisterAddress(Address)
-#             return Response({'status': True, 'address': serializer.data}, status=status.HTTP_200_OK)
-#         else:
-#             return Response({'status': False, 'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-# class Add_register(APIView):
-#     def post(self, request):
-#         serializer = RegisterAddress(data=request.data)
-#         if serializer.is_valid():
-#             token = serializer.validated_data['token']
-#             if not User.objects.filter(access_token=token).exists():
-#                 return Response({'status': False, 'message': 'Token is not valid'}, status=status.HTTP_400_BAD_REQUEST)
-#             user = User.objects.get(access_token=token)
-#             address_data = serializer.validated_data
-#             address_data['user'] = user
-#             address = Address(**address_data)  # Create an instance of Address
-#             address.save()  # Save the instance
-#             return Response({'status': True, 'address': serializer.data}, status=status.HTTP_200_OK)
-#         else:
-#             return Response({'status': False, 'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 class Add_register(APIView):
     def post(self, request):
         serializer = RegisterAddress(data=request.data)
         if serializer.is_valid():
-            token = serializer.validated_data.pop('token', None)  # Remove 'token' from validated data
+            token = serializer.validated_data.pop('token', None) 
             if not User.objects.filter(access_token=token).exists():
                 return Response({'status': False, 'message': 'Token is not valid'}, status=status.HTTP_400_BAD_REQUEST)
             user = User.objects.get(access_token=token)
             address_data = serializer.validated_data
             address_data['user'] = user
-            address = Address(**address_data)  # Create an instance of Address
-            address.save()  # Save the instance
+            address = Address(**address_data)  
+            address.save()  
             return Response({'status': True, 'address': serializer.data}, status=status.HTTP_200_OK)
         else:
             return Response({'status': False, 'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
@@ -245,4 +210,33 @@ class GetUserAddress(APIView):
             return Response({'status': True, 'addresses': serializer.data}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'status': False, 'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+class EditAddress(APIView):
+    def post(self, request):
+        access_token = request.headers.get('Authorization')
+        if not access_token:
+            return Response({'status': False, 'message': 'Access token is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = EditAddressSerializer(data=request.data)
+        if serializer.is_valid():       
+            access_token = access_token.split(' ')[1] if 'Bearer' in access_token else access_token
+            if not User.objects.get(access_token=access_token):
+                return Response({'status': False, 'message': 'Token is not valid'}, status=status.HTTP_400_BAD_REQUEST)
+            user = User.objects.get(access_token=access_token)
+            id = serializer.validated_data['id']
+            try:
+                address = Address.objects.get(id=id)
+            except Address.DoesNotExist:
+                return Response({'status': False, 'message': 'Address not found'}, status=status.HTTP_404_NOT_FOUND)
+            address.user = user
+            address.street = serializer.validated_data['street']
+            address.apt_name = serializer.validated_data['apt_name']
+            address.business_name = serializer.validated_data['business_name']
+            address.zip_code = serializer.validated_data['zip_code']
+            address.save()
+            updated_serializer = EditAddressSerializer(address)
+            return Response({'status': True, 'address': updated_serializer.data}, status=status.HTTP_200_OK)
+        else:
+            return Response({'status': False, 'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        
 
