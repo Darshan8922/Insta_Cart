@@ -2,11 +2,12 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 from django.utils import timezone
 
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.db import models
+from django.utils import timezone
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
-        """
-        Creates and saves a User with the given email and password.
-        """
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
@@ -17,9 +18,6 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        """
-        Creates and saves a superuser with the given email, and password.
-        """
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -28,6 +26,10 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
+        return self._create_user(email, password, **extra_fields)
+
+    def _create_user(self, email, password=None, **extra_fields):
+        extra_fields.pop('is_superuser', None)  
         return self.create_user(email, password, **extra_fields)
 
 class User(AbstractBaseUser):
@@ -45,11 +47,9 @@ class User(AbstractBaseUser):
     VENDOR = 1
     CUSTOMER = 2
     ROLE_CHOICES = (
-
         (VENDOR, 'Vendor'),
         (CUSTOMER, 'Customer'),
     )
-
     role = models.IntegerField(choices=ROLE_CHOICES, default=CUSTOMER)
 
     is_active = models.BooleanField(default=True)
@@ -62,7 +62,12 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+    
+    def has_module_perms(self, app_label):
+        return True
 
+    def has_perm(self, perm, obj=None):
+        return True
 
 class Address(models.Model):
     user = models.ForeignKey(User, related_name='addresses', on_delete=models.CASCADE)
