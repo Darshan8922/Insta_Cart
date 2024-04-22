@@ -55,8 +55,9 @@ class UserDetailSerializer(serializers.Serializer):
     phone = serializers.CharField(required=False)
     
 #Address
-class RegisterAddress(serializer.Serializer):  
-    token = serializers.CharField()
+class RegisterAddress(serializers.Serializer):  
+    id = serializers.IntegerField(read_only=True, source='pk')
+    token = serializers.CharField(write_only=True)
     street = serializers.CharField()
     apt_name = serializers.CharField()
     business_name = serializers.CharField()

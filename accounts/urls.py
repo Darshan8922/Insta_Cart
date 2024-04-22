@@ -16,4 +16,8 @@ urlpatterns = [
     #ChangeDetail
     path("change-details/", ChangeDetail.as_view()),
     
+    #Address
+    path("register-address/", Add_register.as_view()),
+    path("address/", GetUserAddress.as_view()),
+    
 ]
