@@ -53,3 +53,12 @@ class UserDetailSerializer(serializers.Serializer):
     email = serializers.CharField(required=False)
     name = serializers.CharField(required=False)
     phone = serializers.CharField(required=False)
+    
+#Address
+class RegisterAddress(serializer.Serializer):  
+    token = serializers.CharField()
+    street = serializers.CharField()
+    apt_name = serializers.CharField()
+    business_name = serializers.CharField()
+    zip_code = serializers.IntegerField()
+    

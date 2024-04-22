@@ -32,7 +32,6 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True, blank=False)
-
     name = models.CharField(max_length=50, blank=True, null=True)
     phone_number = models.CharField(max_length=12, blank=True, null=True)
     #Tokens
@@ -65,5 +64,12 @@ class User(AbstractBaseUser):
         return self.email
 
 
+class Address(models.Model):
+    user = models.ForeignKey(User, related_name='addresses', on_delete=models.CASCADE)
+    street = models.CharField(max_length=100, blank=True, null=True)
+    apt_name = models.CharField(max_length=50, blank=True, null=True)
+    business_name = models.CharField(max_length=40, blank=True, null=True)
+    zip_code = models.IntegerField(blank=True, null=True)
 
-
+    def __str__(self):
+        return f"{self.street}, {self.apt_name}, {self.business_name}, {self.zip_code}"

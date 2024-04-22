@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserRegistrationSerializer, LoginSerializer, ForgotSerializer, ChangePasswordSerializer, ForgotpasswordSerializer, RefreshTokenSerializer, UserDetailSerializer
+from .serializers import UserRegistrationSerializer, LoginSerializer, ForgotSerializer, ChangePasswordSerializer, ForgotpasswordSerializer, RefreshTokenSerializer, UserDetailSerializer, RegisterAddress
 from django.contrib.auth import authenticate
 from datetime import datetime
 from django.conf import settings
@@ -177,5 +177,21 @@ class GetUserDetail(APIView):
             return Response({'status': False, 'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
-
+class Add_register(APIView):
+    def post(self, request):
+        serializer = RegisterAddress(data=request.data)
+        if serializer.is_valid():
+            token = serializers.validated_data['token']
+            if not User.objects.filter(access_token=token).first():
+                return Response({'status': False, 'message': 'Token is not valid'}, status=status.HTTP_400_BAD_REQUEST)
+            user = User.objects.get(access_token=token)
+            user.street = serializers.validated_data['street']
+            user.apt_name = serializers.validated_data['apt_name']
+            user.business_name = serializers.validated_data['business_name']
+            user.zip_code = serializers.validated_data['zip_code']
+            user.save()
+            serializer = RegisterAddress(user)
+            return Response({'status': True, 'address': serializer.data}, status=status.HTTP_200_OK)
+            
+            
 
