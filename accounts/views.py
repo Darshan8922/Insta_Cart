@@ -69,6 +69,7 @@ class ChangePasswordAPI(APIView):
             else:
                 return Response({'status': False, 'message': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
+            return Response({'status': False, 'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
             return Response({'status': False, 'message': 'Enter valid credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 #Forgot Password
