@@ -19,5 +19,6 @@ urlpatterns = [
     #Address
     path("register-address/", Add_register.as_view()),
     path("address/", GetUserAddress.as_view()),
+    path("edit-address/", EditAddress.as_view()),
     
 ]

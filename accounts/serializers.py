@@ -63,3 +63,11 @@ class RegisterAddress(serializers.Serializer):
     business_name = serializers.CharField()
     zip_code = serializers.IntegerField()
     
+
+class EditAddressSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    street = serializers.CharField()
+    apt_name = serializers.CharField()
+    business_name = serializers.CharField()
+    zip_code = serializers.IntegerField()
+    
