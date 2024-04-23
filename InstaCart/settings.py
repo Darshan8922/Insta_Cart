@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     "shop",
+    "products",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
