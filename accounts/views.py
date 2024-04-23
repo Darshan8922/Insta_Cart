@@ -133,7 +133,7 @@ class ValidateRefreshToken(APIView):
             return Response({'status': False, 'message': 'Invalid refresh token'}, status=status.HTTP_400_BAD_REQUEST)
             
 class ChangeDetail(APIView):
-    def patch(self, request):
+    def put(self, request):
         serializer = UserDetailSerializer(data=request.data)
         if serializer.is_valid():
             token = serializer.validated_data['access_token']
