@@ -29,3 +29,27 @@ class ListProduct(APIView):
 class ListSubCat(generics.ListCreateAPIView):
     queryset = ProductSubCat.objects.all()
     serializer_class = SubCatSerializer
+    
+class ProductBySubCatAPIView(generics.ListAPIView):
+    serializer_class = ListProductSerializer
+
+    def get_queryset(self):
+        subcat_id = self.kwargs['subcat_id']
+        return Product.objects.filter(subcat_id=subcat_id)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        subcat_id = self.kwargs['subcat_id']
+        products = queryset
+        serializer = self.get_serializer(products, many=True)
+        product_images = {}
+        for product in products:
+            images = product.image_set.all() 
+            image_serializer = ImageSerializer(images, many=True)
+            product_images[product.id] = image_serializer.data
+
+        response_data = {
+            'products': serializer.data,
+            'images': product_images
+        }
+        return Response(response_data)

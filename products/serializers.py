@@ -30,3 +30,11 @@ class SubCatSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductSubCat
         fields = '__all__'
+        
+        
+# class ProductSubCat(serializers.Serializer):
+#     id = serializer.CharField(write_only=True)
+#     title = serializer.CharField(read_only=True)
+#     logo = serializer.CharField(read_only=True)  
+#     subcat = serializer.ForeignKey()
+    
