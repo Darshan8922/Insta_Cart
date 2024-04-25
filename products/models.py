@@ -2,10 +2,18 @@ from django.db import models
 from shop.models import Shop
 from accounts.models import User
 
+class ProductSubCat(models.Model):
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=20, unique=True, null=True, blank=True)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True, blank=True)
+    def __str__(self):
+        return self.title
+
 class ProductCategory(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=20, unique=True)
     logo = models.CharField(max_length=100, blank=True, null=True)  
+    subcat = models.ForeignKey(ProductSubCat, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -17,12 +25,12 @@ class Measurement(models.Model):
     def __str__(self):
         return self.type
     
-    
 class Product(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=200)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE) 
     category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE) 
+    subcat = models.ForeignKey(ProductSubCat, on_delete=models.CASCADE, blank=True, null=True)
     price = models.CharField(max_length=5)
     details = models.CharField(max_length=5000, blank=True, null=True)
     ingredients = models.CharField(max_length=5000, blank=True, null=True)
