@@ -1,8 +1,9 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Product, Image, Measurement
+from .models import Product, Image, Measurement, ProductSubCat
 from shop.models import Shop
-from .serializers import ListProductSerializer, ImageSerializer
+from .serializers import ListProductSerializer, ImageSerializer, SubCatSerializer, ProductSubCat
+from rest_framework import generics
 
 class ListProduct(APIView):
     def get(self, request):
@@ -22,3 +23,9 @@ class ListProduct(APIView):
             return Response({"products": serializer.data, "images": product_images})
         else:
             return Response({"message": "Shop not found"}, status=404)
+
+
+
+class ListSubCat(generics.ListCreateAPIView):
+    queryset = ProductSubCat.objects.all()
+    serializer_class = SubCatSerializer

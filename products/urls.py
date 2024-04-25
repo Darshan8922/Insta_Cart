@@ -8,4 +8,5 @@ from rest_framework.routers import DefaultRouter
 urlpatterns = [
 
     path("ListProduct/", ListProduct.as_view()),
+    path("List-Subcat/", ListSubCat.as_view()),
 ]
